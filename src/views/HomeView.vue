@@ -35,8 +35,8 @@
 
 <script>
 // @ is an alias to /src
-import config from '../../config';
-import axios from 'axios';
+import flickr from '../flickr';
+
 import ImageCard from '../components/ImageCard.vue';
 
 
@@ -60,31 +60,21 @@ export default {
   methods: {
     search() {
       this.laoding=true;
-      this.fetchImages().then((response) => {
-        this.images = response.data.photos.photo;
-        this.loading = false;
-        this.tag = ""
-      })
+      this.fetchImages();
+      this.loading = false;
+      this.tag = "";
     },
     fetchImages() {
-      return axios({
-      method: 'get',
-      url: 'https://api.flickr.com/services/rest',
-      params: {
-        method: 'flickr.photos.search',
-        format: 'json',
-        nojsoncallback: 1,
-        per_page: 30,
+      return flickr('photos.search', {
         tags: this.tag,
-        api_key: config.api_key,
-        extras: 'url_n, owner_name, date_taken, views',
+        extras: 'url_n, owner_name, description, date_taken, views',
         page: 1,
-      }
-    })
+        per_page: 30,
+      }).then((response) => {
+        this.images = response.data.photos.photo
+      });
     },
-
-   
-   }
+  }
 };
 </script>
 
